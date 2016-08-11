@@ -7,6 +7,7 @@ Testing yaparken ürünümüzü ne kadar hızlı çıkaracağımız ile testing 
 4 Farklı test tipi olduğunu söyleyebiliriz.
 
 Bunlar:
+```
                  Business
         ############################
         # Acceptance | Exploratory # 
@@ -14,6 +15,7 @@ Support #--------------------------# Critique
         #     Unit   |  Property   #
         ############################
 				Technology
+```
 
 şeklinde bir diagram ile gösterilebilir. Technology tarafındaki testler bizim yazılım yaparken rahat olmamızı sağlayan testlerken, business facing olanlar iş tarafındaki kişilere sistemin sağlamlığını daha iyi gösterilebecek tarzda testler olabilir. Technology tarafında genellikle otomatize olmuş response/performance benchmarklar ve basit functonality kontrol eden unit testler vardır.
 
