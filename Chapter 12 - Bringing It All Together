@@ -1,0 +1,56 @@
+# Brining It All Together
+Daha önceki bölümlerde microservislerin ne olduğunu, boundrylerini nasıl tanımlamamız gerektiğininden tutun entegrasyon ve güvenlik ve monitoring konusundaki endişlerimizi konuştuk. Hatta microservislerde bir mimarın rolünün ne olduğunu sıkıştıracak vaktimiz bile oldu.
+
+Bunların hepsi algılaması zor şeyler, kendileri küçük konular olabilir ama genişlikleri ve etkileri değil. Bu yüzden bu chapterda kitap üzerindeki önemli noktaların özetini geçmiş olacağız.
+
+## Principles of Microservices
+Bölüm 2de prensiplerin nasıl bir rol oynacağını konuşmuştuk. Bir şeylerin neden belli bir yöntemle ve neden o şekilde yapılması gerektiği hakkındalardı. ne kadar kendi prensipleriniz olsada microservis yapısını doğru yapmak için bazı anahtar prensipler olduğunu düşünmekteyim.
+
+Burada bahsedeceğim prensipleri uygulamadığınız zaman kaybediceklerinizi anlayacak durumda olmanız lazım.
+
+### Model Around Business Concepts
+Domain boundrylerinizi belirlerken business konseptlerinizi kullanın. Eğer işimiz hakkında yeterince bilgiye sahipsek, tanımlayacağımız arayüzler daha stabil oalcaktır.
+
+### Adopt a Culture of Automation
+Microservisler oldukca fazla kompleksiti getirir. Bunun bir kısmı handle etmemiz gereken büyük sayıda oynayan parçalardan kaynaklanır. Otomasyon kültürü takip etmek, bu işi kolaylaştırmak için güzel bir yöntemdir. Continous Integration ve otomatik testler servislerimizin çalışacağı konusunda bize güven verir. Tüm servislerimizi istediğimiz yere deploy etmemizi sağlayan ortak bir command line call, continous delivery konusuna adapte olmamızı sağlayabilir. Böylece her checkinimiz konusunda hızlı feedback alabiliriz.
+
+Environment definitionları kullanarak bir environmenti diğerinden ayıran tanımlamalar yapın. Böylece uniform bir deployment yapmanız daha kolay olabilir. Immutable server yapısını kullanarak, sistemlerimiz ve sunucularımız hakkında düşünmesini kolaylaştırın.
+
+### Hide Internal Implementation Details
+Bir servisin yeteneğini maksimize etmek için implementasyon detaylarını saklamak önemlidir. Bounded context modellemek yardımcı olabilir. Böylece paylaşmamız gereken ve gizlememiz gereken modelleri tanımlamış oluruz. Servisler aynı zamanda veritabanı ilişkilerini gizlemeli ve data pumplar kullanarak servisler arası reporting yapmalılardır.
+
+Mümkün olduğu yerde teknoloji agnostik apiler seçin. Rest kullanmayı düşünün. RPC kullansanız bile bu fikirleri kullanabilirsiniz.
+
+### Decentralize All the Things
+Microservislerin otonomluğunu maksimize etmek için microservis ile ilgili kararları microservis takibi takımlara vermemiz gerekir. Bu yüzden olabildiğince self-service yapısında kalmaya çalışın. Takımlarınızın sorumlu olduğu microservisleri olsun ve farklı takımlardan kişiler işinizin görüşünü ileriye götürmek için iletişimde olsunlar.
+
+Bu görüş mimariyede yansıyabilir. ESB ve orchestration gibi centralized business logic ve dumb servisler oluşturabilecek sistemlerden kaçının. Kareografiyi, orkestrasyona tercih edin. Microservislerinizin iş ile ilgili işlemleri kendi içlerinde tutmalarını ve cohesive olmalarını sağlayıp, akıllı özerk bireyler olmasını sağlayın.
+
+### Independently Deployable
+Microservislerin kendi başlarına deployable olması gerektiğini unutmamız lazım. Bu bizim altın kuralımız. Bozucu değişiklikler olduğu zaman bile birden fazla versiyon endpointini aynı anda yaşatmaya çalışmalı ve consumerlarımızın zamanla yeni değişiklere geçmelerini sağlamalıyız. Bu değişik yaparken korkmamamıza sebep olur.
+
+Tek servis, tek host modelini benimseyerek servislerin diğer servisler üzerindeki etkisin azaltmayı hedefleyebiliriz. Blue/green veya canary release tekniklerinden birini ve deployment ile relesae'i birbirinden ayırmayı deneyin. Consumer-driven contracts kullanarak bozucu değişiklikler yaşanmadan yakalayın.
+
+Servisinizde bir değişiklik yapıp güncelleme yaptığınız zaman, servisin başka servisleri etkilemeden çalışması norm olmalı, exception değil. Consumerlarınız kendilerini ne zaman update etmeleri gerektiğine karar vermeli, ve sizde buna uymalısınız.
+
+### Isolate Failure
+Microservisleriniz monolitik sistemlerden daha dayanıklı olmalıdırlar. Remote calllar ile local caller arasındaki ayrımı iyi yapın. Yaptığınız callların fail olabileceğine inanın ve buna göre davranın. Kullandığınız kütüphanelerin remote calları çok abstract hale getirip, local calllardan farksız hale getirmesine sebep olmayın.
+
+Timeoutlarınızı iyi set edin. Bulhead ve circuit breakers kullanarak fail olan componentların falloutlarını azaltın. Yaptığınız çağrıların müşterilere ne gibi etkileri olacağını düşünün ve cap teoremini unutmayın.
+
+### Highly Observable
+Loglarınızı ve istatistiklerinizi toplayın. Correlation idler kullanarak sisteminizde bir hata geldiğinde kaynağı bulabileceğiniz duruma gelin.
+
+Tek bir makinenin veya bir servisin çalıştığını görerek sistemin doğru çalıştığından emin olamayız. Genel bir bakış açısına sahip olabileceğiniz bir monitoring uygulayın.
+
+Bu konda güzel bir örnek netflixin projeleri olabilir. Check out [Vizceral](http://techblog.netflix.com/2016/08/vizceral-open-source.html)
+
+## When Shouldn't You Use Microservices
+Eğer microservisleriniz için doğru bounded contextleri bulabilecğeiniz bir iş yapmıyorsanız, microservislerinizi sürekli değiştirmek pahalıya patlayabilir. O yüzden eğer iş gereksinimlerinizi tam olarak bilmiyorsanız, microservis yapısına geçmekte acele etmeyin. Özellikle greenfield development yapıyorsanız.
+
+Bir iki microservis ile çalışıyorsanız, cpu stats gibi bir monitoring işinize yarayabilir. Fakat birbiriyle ilintili çok fazla sayıda microservisiniz varsa başka yapıda bir monitoringe geçmeniz lazım demektir. Bu kitap umarım servis sayınız arttıkca karşılaşacağınız sorulardan bir kaçını görmeniz konusudna yardımcı olacaktır.
+
+## Parting Words
+Microservisler size vericek çok fazla karar vericektir. Microservis dünyasında karar vermek çok sık yaptığınız bir aktiivitedir. Ve bu kararların hepsini doğru vermeyeceksiniz. Bu yüzden seçenekleriniz nedir? Vereceğiniz kararların domainini küçük tutup, eğer yanlış yaparsanız bu yanlışın küçük bir şeyi kapsayacağını sağlamaktır. Evrensel mimari konseptini kavrayın. Yeni şeyler öğrendikce sisteminizin bend olduğu ve esnediği. Big-bang rewritelar yerine sisteminize sırasıyla yapacağınız küçük değişiklikleri düşünün.
+
+Umarım şimdiye kadar microservislerin sizin için olup olmadığını anlayacağınız kadar bilgi ve deneyim paylaşabilmişimdir. Eğer microservisler sizin içinse, umarım onları bir hedef olarak değilde bir yolculuk olarak görürsünüz. Incrementally gidin. Sisteminizi yavaş yavaş parçalayın ve parçaladıkca öğrenin. Sürekli değişme ve evrim geçirme disiplini, kitapta sizinle paylaştığım diğer herşeyden daha önemlidir. Buna alışın. Değişim engellenemez. Kucaklayın.
